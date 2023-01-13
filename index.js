@@ -145,7 +145,7 @@ if (message.content.toLowerCase().startsWith(prefix + "craft")) {
   let item = args[1];
   
   let amount = parseInt(args[2]);
-  if (item != "stick" &&  item != "wooden_pickaxe" && item != "handle") return message.channel.send("You tried to craft.. oh wait, you didn't. BECAUSE YOU CANT MAKE WHATEVER A ${item} IS") 
+  if (item != "stick" &&  item != "wooden_pickaxe" && item != "stick") return message.channel.send(`You tried to craft.. oh wait, you didn't. BECAUSE YOU CANT MAKE WHATEVER A ${item} IS`) 
    if(amount < 1) return message.channel.send("Please enter a valid number")
   if (isNaN(amount)) {
       return message.channel.send(`Please enter a valid number.`);}
