@@ -1,3 +1,4 @@
+
 //online
 
 
@@ -6,7 +7,6 @@ app.get(`/`, (req, res) => {
   res.send("I AM THE TERMINATOR")
   res.send("I can see you 👁")
 })
-
 app.listen(3000, () => {
 })
 const Database = require("@replit/database");
@@ -14,6 +14,9 @@ const db = new Database()
 const Discord = require("discord.js");
 const client = new Discord.Client();
 const ms = require(`ms`)
+const {CommandCooldown, msToMinutes} = require('discord-command-cooldown');
+const dailycd = new CommandCooldown('earnCash', ms('24h'));
+const weeklycd = new CommandCooldown('earnCash2', ms('168h'));
 const prefix = "!"
 const woodcube = "<:wood_r:1061673865832575086>"
 const xpcube = "<:xp_r:1061677421503451236>"
@@ -65,6 +68,7 @@ const marketPrices = {
 
 console.log(`Prefix is ${prefix}`)
 console.log(`Did you know geico can save you 15% or more on car insurance?`)
+console.log(`No`)
 
 
 
@@ -74,6 +78,7 @@ client.on('ready', () => {
   client.user.setActivity('Become a legend in the world of Swords and Shields!', { type: 'PLAYING' })
 })
 client.on("debug", (e) => console.log(e));
+
 
 
 
@@ -121,20 +126,121 @@ let cc = await db.get(`cc_${message.author.id}`);
       if (level === null) level = 0
 let pfp = await db.get(`pfp_${message.author.id}`);
     if (pfp === null || 0) await db.set(`pfp_${message.author.id}`,`https://th.bing.com/th/id/OIP.gAEpFxnL34NphkfRucK-WQHaHj?w=212&h=215&c=7&r=0&o=5&pid=1.7`)
+  let craftcount = await
+db.get(`craftcount_${message.author.id}`);
+  if (craftcount === null) craftcount = 0
+  const Master_Salesman = await db.get(`Master_Salesman_${message.author.id}`);
+  if (Master_Salesman === false) await db.set(`MS_${message.author.id}`, 1)
+  if (Master_Salesman === true)
+  await db.set(`MS_${message.author.id}`, 3)
+  let MS = await db.get(`MS_${message.author.id}`);
+  let played = await db.get(`played_${message.author.id}`);
+  if (played === null) played = false
+  //stats
+  
+  //strength 
+  let strength  = await db.get(`strength_${message.author.id}`);
+    if (strength === null) strength  = 0
 
+  //smarts
+  let smarts  = await db.get(`smarts_${message.author.id}`);
+    if (smarts === null) smarts  = 0
+
+  //speed
+  let speed  = await db.get(`speed_${message.author.id}`);
+    if (speed === null) speed  = 0
+
+
+
+
+
+
+
+
+
+
+
+  
+  //create character
+  if (message.content.toLowerCase().startsWith(prefix + 'createchar')) {
+    await db.set(`cc_${message.author.id}`, cc + 1);
+    console.log("CREATECHAR")
+    // Check if the user already has a character
+    const character = await db.get(`char_${message.author.id}`);
+    if (character) {
+      message.channel.send('You already have a character! Use `!char` to view your character.');
+      return;
+    }
+
+    // Get the user's input for the character's name and class
+    const args = message.content.split(' ').slice(1);
+    if (args.length < 2) {
+      message.channel.send('Please provide a name and class for your character. For example: `!createchar Bob Brute` to view all the clases do `!class`');
+      return;
+    }
+    
+    const name = args[0];
+    const Class = args[1];
+    console.log("Class: " + Class + " Name: " + name)
+
+    if (name === undefined){
+      message.channel.send('you cannot name your character this.');}
+    if (Class !== "brute" && Class !== "Brute" && Class !== "Wizard" && Class !== "wizard" && Class !== "speedster" && Class !== "Speedster")  return message.channel.send('Please enter a valid class use `!class`')
+    // Create the character object and store it in the database
+    const newChar = { name, Class };
+    await db.set(`char_${message.author.id}`, newChar);
+    //adds stats
+    //brute
+    if(Class == "brute" || Class == "Brute" )
+    {
+      await db.set(`strength_${message.author.id}`, 4);
+      await db.set(`smarts_${message.author.id}`, 0);
+      await db.set(`speed_${message.author.id}`, 2);
+
+    }
+
+    //wizard
+    if(Class == "wizard" || Class == "Wizard" )
+    {
+      await db.set(`strength_${message.author.id}`, 1);
+      await db.set(`smarts_${message.author.id}`, 4);
+      await db.set(`speed_${message.author.id}`, 1);
+
+    }
+
+    ////speedster 
+    if(Class == "Speedster"  || Class == "speedster"  )
+    {
+      await db.set(`strength_${message.author.id}`, 1);
+      await db.set(`smarts_${message.author.id}`, 1);
+      await db.set(`speed_${message.author.id}`, 4);
+
+    }
+   
+
+    
+
+    // Send a message to the user confirming that the character was created
+    message.channel.send(`Your character "${name}" has been created! Use "!char" to view your character.`);}
+
+
+
+
+  
+  //purge
 if(message.content.toLowerCase().startsWith(prefix + "purge")){ 
   let arg = message.content.split(" ") 
   let clear = arg[1]; 
-                                      if(isNaN(clear)){ return message.channel.send("```Please put a valid number to clear messages.```") }
-                                      if(clear > 100){ return message.channel.send("``I can't clear more than 100 messages.``")} 
-                                      if(clear < 1){ return message.channel.send("```You cannot Cclear less than 1 message.```") }
+  if(isNaN(clear)){ return message.channel.send("```Please put a valid number to clear messages.```") }
+  if(clear > 100){ return message.channel.send("``I can't clear more than 100 messages.``")} 
+  if(clear < 1){ return message.channel.send("```You cannot Cclear less than 1 message.```") }
 
 if (!message.member.hasPermission("MANAGE_MESSAGES")) { return message.channel.send("```You lack the permissions to do this.```") }
 
 if (!message.guild.me.hasPermission("MANAGE_MESSAGES")) { return message.channel.send("```I do not have permission to do this. please update my role!```") }
 db.set(`cc_${message.author.id}`, cc + 1);                                      message.channel.bulkDelete(clear)}
 
-
+//help
 if (message.content.toLowerCase().startsWith(prefix + "help")){
   db.set(`cc_${message.author.id}`, cc + 1);
   let embed = new Discord.MessageEmbed()
@@ -161,7 +267,54 @@ if (message.content.toLowerCase().startsWith(prefix + "help")){
   
   message.channel.send(embed)
 }
+//class
+if (message.content.toLowerCase().startsWith(prefix + "class")){
+let embed = new Discord.MessageEmbed()
 
+.setTitle(`**Classes**`)
+.addField(`Brute`, `Chunky, strong, stupid.
+
+Perks: physical stats ++
+mine command is better
+chop command is better
+
+Downsides:
+Due to lack of smarts, you'll have a harder time crafting, and will have slower cooldowns.
+
+Stats: 
+Strength +4
+Speed +2
+Smarts +0`, false)
+.addField(`Smartass`, `Big brained, kinda weak, really annoying.
+
+Perks: your speech and intelligence lets you convince the shopkeepers to give you discounts (shop prices -)
+
+craft command is better
+
+Downsides:
+your smartassery and tiny man stature makes gathering resources a bit harder and fighting alot harder
+
+Stats:
+Smarts +4
+Speed +1
+Strength +1`, false)
+.addField(`Speedy`, `Fast, smartish, weak.
+
+Perks: you do everything faster (cooldown time -)
+you are smart enough to not be scammed by shopkeepers (shop prices =)
+
+Downsides:
+Whats an attack?
+I'm fast, not strong. -the speedster
+
+Stats:
+Speed +4
+Smarts +1
+Strength +1`, false)
+  
+message.channel.send(embed)
+}
+  
 //craft
 if (message.content.toLowerCase().startsWith(prefix + "craft")) {
   await db.set(`cc_${message.author.id}`, cc + 1);
@@ -180,6 +333,7 @@ if (message.content.toLowerCase().startsWith(prefix + "craft")) {
     if(wood < 2 * amount) return message.channel.send("You dont have enough wood (you need `2 wood` for this")
      await db.set(`stick_${message.author.id}`, stick + amount);
 db.set(`wood_${message.author.id}`, wood - amount * 2);
+db.set(`craftcount_${message.author.id}`, craftcount + amount);
     message.channel.send(`You crafted ${amount} sticks`)
   }
  if(item === "wooden_pickaxe"){
@@ -204,9 +358,9 @@ db.set(`handles_${message.author.id}`, Ihandles - amount * 1);
     message.channel.send(`You crafted ${amount} handles.`)
   }
   if(item === "coal"){
-    if(wood < 3 * amount){ message.channel.send("You dont have enough wood (you need `3 wood` to make coal)")}
+    if(wood < 3 * amount) return message.channel.send("You dont have enough wood (you need `3 wood` to make coal)")
     await db.set(`coal_${message.author.id}`, coal + amount);
-db.set(`wood_${message.author.id}`, wood - amount * 3);
+db.set(`wood_${message.author.id}`, wood - (amount * 3));
   }
   if(item === "refined_stone"){
   if(stone < 2 * amount) return message.channel.send("You dont have enough stone (you need `2 stone` to craft this)")
@@ -242,11 +396,13 @@ await db.set(`cc_${message.author.id}`, cc + 1);
     if (tool === 0) return message.channel.send("You need a pickaxe to do that")
 
     let timeout = 90000;
-    let z1 = x * (tool + 1)
+    let z1 = strength + x * (tool + 1)
     let z2 = y * (tool + 1)
     //lol | there | lol
   if (EnergyDrink === true) timeout = timeout/2;
-
+ let STATspeedcooldown = speed * 0.05
+    let STATsmartcooldown = smarts * 0.01
+     timeout = timeout - STATspeedcooldown - STATsmartcooldown
 
 
 
@@ -279,11 +435,14 @@ await db.set(`cc_${message.author.id}`, cc + 1);
     let y = Math.floor(Math.random() * 10) + 1;
     
     let tool = await db.get(`tool_axe_chop_${message.author.id}`);
-   
+  
     let timeout = 90000;
-    let z1 = x * (tool + 1)
+    let z1 = strength + x * (tool + 1)
     let z2 = y * (tool + 1)
 if (EnergyDrink === true) timeout = timeout/2;
+    let STATspeedcooldown = speed * 0.05
+    let STATsmartcooldown = smarts * 0.01
+     timeout = timeout - STATspeedcooldown - STATsmartcooldown
 
 
 
@@ -318,9 +477,11 @@ if (EnergyDrink === true) timeout = timeout/2;
     if (gold === null) gold = 0
     let handleA = await db.get(`handles_${message.author.id}`);
     if(handleA == null) db.set(`handles_${message.author.id}`, 0);
-    
+    let Master_Salesman = await db.get(`Master_Salesman_${message.author.id}`);
+  if (Master_Salesman === false) await db.set(`MS_${message.author.id}`, 1)
+  if (Master_Salesman === true)
+  await db.set(`MS_${message.author.id}`, 3)
     let args = message.content.substring(prefix.length).split(" ")
-   const Master_Salesman = await db.get(`Master_Salesman_${message.author.id}`);
     let resource = args[1];
     let amount = parseInt(args[2]);
     if (isNaN(amount)) {
@@ -334,9 +495,7 @@ if (EnergyDrink === true) timeout = timeout/2;
     }
     if (resource == "wood") {
       if (woodA >= amount) {
-        const price = marketPrices[resource] * amount;
-     
-        if (Master_Salesman === true)  price === price * 3;
+        const price = marketPrices[resource] * amount * MS;
         message.channel.send(`You sold ${amount} ${resource} for ${price} gold ${goldcube}.`);
         await db.set(`gold_${message.author.id}`, gold + price)
         await db.set(`wood_${message.author.id}`, woodA - amount)
@@ -344,8 +503,7 @@ if (EnergyDrink === true) timeout = timeout/2;
     } else {
       if (resource == "stone") {
         if (stoneA >= amount) {
-          const price = marketPrices[resource] * amount;
-        if (Master_Salesman === true)  price === price * 3;
+          const price = marketPrices[resource] * amount * MS;
           message.channel.send(`You sold ${amount} ${resource} for ${price} gold ${goldcube}.`);
           await db.set(`gold_${message.author.id}`, gold + price)
           await db.set(`stone_${message.author.id}`, stoneA - amount)
@@ -354,8 +512,7 @@ if (EnergyDrink === true) timeout = timeout/2;
       }else {
       if (resource == "handle") {
         if (handleA >= amount) {
-          const price = marketPrices[resource] * amount;
-        if (Master_Salesman === true)  price === price * 3;
+          const price = marketPrices[resource] * amount * MS;
           message.channel.send(`You sold ${amount} ${resource} for ${price} gold ${goldcube}.`);
           await db.set(`gold_${message.author.id}`, gold + price)
           await db.set(`handles_${message.author.id}`, handleA - amount)
@@ -368,35 +525,7 @@ if (EnergyDrink === true) timeout = timeout/2;
   
 
 
-  //create character
-  if (message.content.toLowerCase().startsWith(prefix + 'createchar')) {
-    await db.set(`cc_${message.author.id}`, cc + 1);
-    console.log("CREATECHAR")
-    // Check if the user already has a character
-    const character = await db.get(`char_${message.author.id}`);
-    if (character) {
-      message.channel.send('You already have a character! Use `!char` to view your character.');
-      return;
-    }
 
-    // Get the user's input for the character's name and class
-    const args = message.content.split(' ').slice(1);
-    if (args.length < 2) {
-      message.channel.send('Please provide a name and class for your character. For example: `!createchar Bob Warrior`');
-      return;
-    }
-    
-    const name = args[0];
-    const Class = args[2];
-    if (name === undefined){
-      message.channel.send('you cannot name your character this.');}
-
-    // Create the character object and store it in the database
-    const newChar = { name, Class };
-    await db.set(`char_${message.author.id}`, newChar);
-
-    // Send a message to the user confirming that the character was created
-    message.channel.send(`Your character "${name}" has been created! Use "!char" to view your character.`);}
 
   //char
   if (message.content.toLowerCase().startsWith(prefix + 'char')) {
@@ -431,24 +560,28 @@ if (EnergyDrink === true) timeout = timeout/2;
     if (xp >= 250000) await db.set(`level_${message.author.id}`, Math.floor(20 + (xp-200000)/50000))
 
     if (xp >= 10000) await db.set(`paragon_${message.author.id}`, 1)
-
     if (xp >= 250000) await db.set(`paragon_${message.author.id}`, 2)
-
     if (xp >= 1000000) await db.set(`paragon_${message.author.id}`, 3)
-
     if (xp >= 5000000) await db.set(`paragon_${message.author.id}`, 4)
-
     if (xp >= 10000000) await db.set(`paragon_${message.author.id}`, 5)
-
     if (xp >= 50000000) await db.set(`paragon_${message.author.id}`, 6)
-
     if (xp >= 100000000) await db.set(`paragon_${message.author.id}`, 7)
-
     if (xp >= 250000000) await db.set(`paragon_${message.author.id}`, 8)
-
     if (xp >= 500000000) await db.set(`paragon_${message.author.id}`, 9)
-
     if (xp >= 1000000000) await db.set(`paragon_${message.author.id}`, 10)
+    if (xp >= 1500000000) await db.set(`paragon_${message.author.id}`, 11)
+    if (xp >= 2000000000) await db.set(`paragon_${message.author.id}`, 12)
+    if (xp >= 3000000000) await db.set(`paragon_${message.author.id}`, 13)
+    if (xp >= 4000000000) await db.set(`paragon_${message.author.id}`, 14)
+    if (xp >= 5000000000) await db.set(`paragon_${message.author.id}`, 15)
+    if (xp >= 6000000000) await db.set(`paragon_${message.author.id}`, 16)
+    if (xp >= 7000000000) await db.set(`paragon_${message.author.id}`, 17)
+    if (xp >= 8000000000) await db.set(`paragon_${message.author.id}`, 18)
+    if (xp >= 9000000000) await db.set(`paragon_${message.author.id}`, 19)
+    if (xp >= 10000000000) await db.set(`paragon_${message.author.id}`, 20)
+    if (xp >= 250000000000) await db.set(`paragon_${message.author.id}`, Math.floor(20 + (xp-250000000000)/50000000000))
+
+    
     if (paragon == 0) {
       // Create an embed message with the character information
       const embed = new Discord.MessageEmbed()
@@ -457,6 +590,9 @@ if (EnergyDrink === true) timeout = timeout/2;
         .addField(`**PICKAXE POWER** ${steelpickaxecube}`, `${ptool}`, true)
         .addField(`**AXE POWER** ${steelaxecube}`, `${atool}`, true)
         .addField(`**TOTAL COMMANDS** ${chesscube}`, `${cc}`, true)
+         .addField(`**STRENGTH**`, `${strength}`, true)
+        .addField(`**SMARTS**`, `${smarts}`, true)
+        .addField(`**SPEED**`, `${speed}`, true)
         .addField(`:x: LOCKED :x:`, "unlock at level 10", true)
         .setThumbnail(pfp)
         .setColor('green');
@@ -468,6 +604,9 @@ if (EnergyDrink === true) timeout = timeout/2;
         .addField(`**PICKAXE POWER** ${steelpickaxecube}`, `${ptool}`, true)
         .addField(`**AXE POWER** ${steelaxecube}`, `${atool}`, true)
         .addField(`**TOTAL COMMANDS** ${chesscube}`, `${cc}`, true)
+        .addField(`**STRENGTH**`, `${strength}`, true)
+        .addField(`**SMARTS**`, `${smarts}`, true)
+        .addField(`**SPEED**`, `${speed}`, true)
         .setThumbnail(pfp)
         .setColor('green');
       message.channel.send(embed)
@@ -541,8 +680,8 @@ if (!imageLink.match(/\.(jpeg|jpg|gif|png)$/)) {
     const itemName = args[1];
 
     // Get the price of the item
-    const price = minershop[itemName];
-
+    let price = minershop[itemName];
+  
     // Check if the item is available for purchase
     if (!price) {
       if (itemName == undefined){
@@ -553,7 +692,9 @@ steel pickaxe: Cost: 1000 | bonus 15**`); return;} else {
         message.channel.send(`There is no item called "${itemName}" in the shop.`);
         return;
 } }
-
+let STATprice = 0 + (smarts * 100 * 0.05 / (smarts + 200)) * (smarts - 0)
+   
+    price = Math.floor((price * (1 - (STATprice))))
     // Check if the user has enough money to buy the item
     const gold = await db.get(`gold_${message.author.id}`);
     if (gold < price) {
@@ -599,8 +740,8 @@ steel pickaxe: Cost: 1000 | bonus 15**`); return;} else {
     const itemName = args[1];
 
     // Get the price of the item
-    const price = LJshop[itemName];
-
+    let price = LJshop[itemName];
+    
    
      
 
@@ -617,6 +758,9 @@ steel pickaxe: Cost: 1000 | bonus 15**`); return;} else {
     }
 
     // Check if the user has enough money to buy the item
+     let STATprice = Math.floor(0 + (smarts * 100 * 0.05 / (smarts + 6)) * (smarts - 0))
+
+price =  price = Math.floor((price * (1 - (STATprice))))
     const gold = await db.get(`gold_${message.author.id}`);
     if (gold < price) {
       message.channel.send(`Sorry, you do not have enough money to buy the item "${itemName}".`);
@@ -724,9 +868,34 @@ await db.set(`xp_${message.author.id}`, xp - 10000);
     
 
 
+  if (message.content.toLowerCase().startsWith(prefix + 'daily')) {
+    const userCooldowned = await dailycd.getUser(message.author.id); // Check if user need to be cooldowned
+    if(userCooldowned){
+        const timeLeft = msToMinutes(userCooldowned.msLeft, false); // False for excluding '0' characters for each number < 10
+        message.reply(`You need to wait ${ timeLeft.hours + ' hours, ' + timeLeft.minutes + ' minutes, ' + timeLeft.seconds + ' seconds'} before running command again!`);
+    }else{
+        message.reply(`Heres some cool stuff for claiming today!
+        You got 250 gold and also 50 xp`)
+        db.set(`gold_{$message.author.id}`, gold + 250)
+        db.set(`xp_{$message.author.id}`, xp + 50)
+        await dailycd.addUser(message.author.id); // Cooldown user again
+    }
+  }
 
-
-
+  if (message.content.toLowerCase().startsWith(prefix + 'weekly')) {
+    const userCooldowned = await weeklycd.getUser(message.author.id); // Check if user need to be cooldowned
+    if(userCooldowned){
+        const timeLeft = msToMinutes(userCooldowned.msLeft, false); // False for excluding '0' characters for each number < 10
+        message.reply(`You need to wait ${ timeLeft.hours + ' hours, ' + timeLeft.minutes + ' minutes, ' + timeLeft.seconds + ' seconds'} before running command again!`);
+    }else{
+        message.reply(`Heres some cool stuff for claiming this week!
+        You got 2500 gold and also 500 xp`)
+        db.set(`gold_{$message.author.id}`, gold + 2500)
+        db.set(`xp_{$message.author.id}`, xp + 500)
+        await weeklycd.addUser(message.author.id); // Cooldown user again
+    }
+  }
+  
 
 
   
@@ -761,6 +930,7 @@ await db.set(`refinedstone_${message.author.id}`, 0);
 await db.set(`stick_${message.author.id}`, 0);
   await db.set(`EnergyDrink_${message.author.id}`, false);
 await db.set(`Master_Salesman_${message.author.id}`, false);}
+db.set(`played_${message.author.id}`, false);
 
 if (message.content.startsWith(prefix + 'paragontest')) {
  
